@@ -13,8 +13,8 @@ Boilerplate includes:
 - webpack isomorphic tools
 
 ```
-npm install
-npm run start
+yarn
+yarn start
 ```
 
 http://localhost:3000
