@@ -44,7 +44,7 @@ class IndexContainer extends Component {
                    <br/>
                    <br/>
                    <br/>
-                   <div>Forked from: <a target={'_blank'} href={'https://github.com/bananaoomarang/isomorphic-redux'}>bananaoomarang</a></div>
+                   <div>Forked from: <a target={'_blank'} href={'https://github.com/atulmy/universal-react'}>atulmy</a></div>
                </div>
            )
     }
