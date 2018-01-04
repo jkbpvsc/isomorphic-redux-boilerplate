@@ -1,0 +1,10 @@
+{
+    "events": {
+        "restart": "npm run build"
+    },
+    "ignore": [
+        "src/static/",
+        "webpack-stats.json",
+        "webpack-assets.json"
+    ]
+}

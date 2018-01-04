@@ -1,0 +1,127 @@
+// Imports
+import { Server } from 'http'
+import Express from 'express'
+
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import { matchPath } from 'react-router'
+import { StaticRouter } from 'react-router-dom'
+import { Helmet } from "react-helmet"
+import { createStore, applyMiddleware } from 'redux'
+import { Provider } from 'react-redux'
+import thunk from 'redux-thunk'
+
+// App Imports
+import { rootReducer } from '../client/setup/store'
+import routes from '../client/setup/routes'
+import App from '../client/components/App'
+import index from './views/index'
+
+// Create new server
+const app = new Express();
+const server = new Server(app);
+
+import webpackConfig from '../../webpack.config.babel';
+import webpack from 'webpack'
+
+const compiler = webpack(webpackConfig);
+
+// Static files folder
+//app.use(Express.static(path.join(__dirname, '../', 'static')));
+
+app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: false,
+    stats: {
+        colors: true,
+        chunks: false,
+        timings: false,
+        version: false
+    },
+    publicPath: '',
+    serverSideRender: true,
+    watchOptions: { aggregateTimeout: 400 }
+}));
+
+app.use(require('webpack-hot-middleware')(compiler));
+
+// Store (new store for each request)
+const store = createStore
+(
+    rootReducer,
+    applyMiddleware(thunk)
+);
+
+app.use('/Api', require('./router/Api'));
+
+// Match any Route
+app.get('*', (request, response) => {
+
+    let status = 200;
+    const matches = routes.reduce((matches, route) => {
+        const match = matchPath(request.url, route.path, route)
+        if (match && match.isExact) {
+            matches.push({
+                route,
+                match,
+                promise: route.component.fetchData ? route.component.fetchData({ store, params: match.params }) : Promise.resolve(null)
+            })
+        }
+        return matches
+    }, []);
+
+    // No such route, send 404 status
+    if (matches.length === 0) {
+        status = 404
+    }
+
+    // Any AJAX calls inside components
+    const promises = matches.map((match) =>  {
+        return match.promise
+    });
+
+    // Resolve the AJAX calls and render
+    Promise.all(promises).then((...data) => {
+
+        const initialState = store.getState();
+        const context = {};
+
+        const appHtml = renderToString(
+            <Provider store={ store } key="provider">
+                <StaticRouter context={ context } location={ request.url }>
+                    <App />
+                </StaticRouter>
+            </Provider>
+        )
+
+        if (context.url) {
+            response.redirect(context.url)
+        } else {
+            // Get Meta header tags
+            const helmet = Helmet.renderStatic();
+
+            let html = index(helmet, appHtml, initialState);
+
+            // Reset the state on server
+            store.dispatch({
+                type: 'RESET'
+            });
+
+            // Finally send generated HTML with initial data to the client
+            return response.status(status).send(html)
+        }
+    }, (error) => {
+        console.error(response, error)
+    })
+});
+
+// Start Server
+const port = process.env.PORT || 3000;
+const env = process.env.NODE_ENV || 'production';
+
+server.listen(port, (error) => {
+    if(error) {
+        return console.error(error)
+    } else {
+        return console.info(`Server running on http://localhost:${port} [${env}]`)
+    }
+});

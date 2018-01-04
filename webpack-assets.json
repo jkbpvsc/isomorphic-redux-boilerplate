@@ -1,0 +1,22 @@
+{
+  "javascript": {
+    "js": "/bundle.js"
+  },
+  "styles": {
+    "js": "/style.css"
+  },
+  "assets": {
+    "./src/client/resources/image/logo.png": "/59c467536111a981d904a050d335c2be.png",
+    "./src/client/sass/src/index.scss": "// removed by extract-text-webpack-plugin\n\"use strict\";",
+    "./node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./src/client/sass/src/index.scss": [
+      [
+        "/home/jkbpvsc/Projects/React/isomorphic-redux-boilerplate/node_modules/css-loader!./node_modules/sass-loader/lib/loader.js!./src/client/sass/src/index.scss.webpack-module",
+        "* {\n  text-align: center; }\n",
+        ""
+      ]
+    ]
+  },
+  "webpack": {
+    "version": "3.10.0"
+  }
+}
