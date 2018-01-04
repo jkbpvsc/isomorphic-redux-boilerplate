@@ -1,7 +1,7 @@
 # Isomorphic Redux Boilerplate
 Lightweight isomorphic redux boilerplate
 
-This is a fork from this bananaoomarang [project](https://github.com/bananaoomarang/isomorphic-redux "isomorphic-redux")
+This is a fork from this atulmy [project](https://github.com/atulmy/universal-react "universal-react")
 
 Boilerplate includes: 
 - css loader
